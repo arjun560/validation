@@ -1,0 +1,288 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register & Login</title>
+</head>
+<body>
+
+    {% if page == "register" %}
+        <h2>Register</h2>
+        <form method="POST">
+            {% csrf_token %}
+            <label>Username:</label>
+            <input type="text" name="username" required><br>
+
+            <label>Email:</label>
+            <input type="email" name="email" required><br>
+
+            <label>Password:</label>
+            <input type="password" name="password" required><br>
+
+            <label>Confirm Password:</label>
+            <input type="password" name="confirm_password" required><br>
+
+            <button type="submit">Register</button>
+        </form>
+        <p>Already have an account? <a href="{% url 'login_view' %}">Login here</a></p>
+
+    {% else %}
+        <h2>Login</h2>
+        <form method="POST">
+            {% csrf_token %}
+            <label>Username:</label>
+            <input type="text" name="username" required><br>
+
+            <label>Password:</label>
+            <input type="password" name="password" required><br>
+
+            <button type="submit">Login</button>
+        </form>
+        <p>Don't have an account? <a href="{% url 'register_view' %}">Register here</a></p>
+    {% endif %}
+
+    {% if messages %}
+        <ul>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+</body>
+</html> -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register & Login</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        input {
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        button {
+            background: #007bff;
+            color: #fff;
+            border: none;
+            padding: 12px;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        p {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .messages {
+            list-style: none;
+            margin-bottom: 20px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .messages li {
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        {% if page == "register" %}
+            <h2>Register</h2>
+            <form id="registerForm" method="POST" onsubmit="return validateRegisterForm()">
+                {% csrf_token %}
+                <label>Username:</label>
+                <input type="text" id="username" name="username" required>
+
+                <label>Email:</label>
+                <input type="email" id="email" name="email" required>
+
+                <label>Password:</label>
+                <input type="password" id="password" name="password" required>
+
+                <label>Confirm Password:</label>
+                <input type="password" id="confirm_password" name="confirm_password" required>
+
+                <p id="registerError" class="error-message"></p>
+
+                <button type="submit">Register</button>
+            </form>
+            <p>Already have an account? <a href="{% url 'login_view' %}">Login here</a></p>
+
+        {% else %}
+            <h2>Login</h2>
+            <form id="loginForm" method="POST" onsubmit="return validateLoginForm()">
+                {% csrf_token %}
+                <label>Username:</label>
+                <input type="text" id="login_username" name="username" required>
+
+                <label>Password:</label>
+                <input type="password" id="login_password" name="password" required>
+
+                <p id="loginError" class="error-message"></p>
+
+                <button type="submit">Login</button>
+            </form>
+            <p>Don't have an account? <a href="{% url 'register_view' %}">Register here</a></p>
+        {% endif %}
+
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li class="{% if message.tags == 'success' %}success{% else %}error{% endif %}">
+                        {{ message }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    <script>
+        // Register Form Validation
+        function validateRegisterForm() {
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const confirmPassword = document.getElementById('confirm_password').value.trim();
+            const error = document.getElementById('registerError');
+
+            if (!username || !email || !password || !confirmPassword) {
+                error.textContent = 'All fields are required.';
+                return false;
+            }
+
+            if (!validateEmail(email)) {
+                error.textContent = 'Please enter a valid email address.';
+                return false;
+            }
+
+            if (
+                password.length < 6 ||                     // At least 8 characters
+                !/[A-Z]/.test(password) ||                 // At least one uppercase letter
+                !/[a-z]/.test(password) ||                 // At least one lowercase letter
+                !/[0-9]/.test(password) ||                 // At least one digit
+                !/[\W_]/.test(password)                    // At least one special character (like !, @, #, etc.)
+                )   {       
+                         error.textContent = 'Password must be at least 8 characters long and include an uppercase letter, lowercase letter, number, and special character.';
+                         return false;
+                    }
+
+            if (password !== confirmPassword) {
+                error.textContent = 'Passwords do not match.';
+                return false;
+            }   
+
+            error.textContent = ''; // Clear error message
+            return true;
+        }
+
+        // Login Form Validation
+        function validateLoginForm() {
+            const username = document.getElementById('login_username').value.trim();
+            const password = document.getElementById('login_password').value.trim();
+            const error = document.getElementById('loginError');
+
+            if (!username || !password) {
+                error.textContent = 'Both fields are required.';
+                return false;
+            }
+
+            error.textContent = ''; // Clear error message
+            return true;
+        }
+
+        // Basic Email Validation
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+    </script>
+
+</body>
+</html>
+
